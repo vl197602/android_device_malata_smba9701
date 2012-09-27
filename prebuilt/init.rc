@@ -119,8 +119,8 @@ on fs
     # Mount /system rw first to give the filesystem a chance to save a checkpoint
     mount ext4 /dev/block/mmcblk0p3 /system
     mount ext4 /dev/block/mmcblk0p3 /system ro remount
-    mount ext4 /dev/block/mmcblk0p4 /data rw wait noatime nodirtime nosuid nodev
-    mount ext4 /dev/block/mmcblk0p6 /cache rw wait nosuid nodev
+    mount ext4 /dev/block/mmcblk0p6 /data rw wait noatime nodirtime nosuid nodev
+    mount ext4 /dev/block/mmcblk0p4 /cache rw wait nosuid nodev
 
 on post-fs
     # once everything is setup, no need to modify /
