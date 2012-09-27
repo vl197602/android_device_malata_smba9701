@@ -69,15 +69,17 @@ ADDITIONAL_DEFAULT_PROPERTIES += \
 ADDITIONAL_DEFAULT_PROPERTIES += \
 	persist.sys.usb.config=adb \
 	ro.phone_storage=1 \
-	service.adb.root=1 \
-	ro.additionalmounts=/mnt/emmc;/mnt/usbdisk \
-	ro.vold.switchablepair=/mnt/sdcard,/mnt/emmc \
+	service.adb.root=1
+
+ADDITIONAL_BUILD_PROPERTIES += \
+	ro.additionalmounts=/storage/sdcard0 \
+	ro.vold.switchablepair=/storage/sdcard0,/storage/microsd
 
 # RIL
-ADDITIONAL_DEFAULT_PROPERTIES += \
+ADDITIONAL_BUILD_PROPERTIES += \
 	rild.libpath=/system/lib/libmbm-ril.so \
-	rild.libargs=-d /dev/ttyACM0 -i wwan0 \
-	keyguard.no_require_sim=1 \
+	rild.libargs="-d /dev/ttyACM0 -i wwan0" \
+	keyguard.no_require_sim=1
 
 # for bugmailer
 ifneq ($(TARGET_BUILD_VARIANT),user)
