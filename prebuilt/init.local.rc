@@ -1,0 +1,12 @@
+# RIL
+setprop rild.libargs="-d /dev/ttyACM0 -i wwan0"
+setprop rild.libpath=/system/lib/libmbm-ril.so
+setprop keyguard.no_require_sim=1
+
+
+# Compcache - handle at boot                                                                                                                          
+service compcache /system/bin/handle_compcache                                                                                                        
+    user root                                                                                                                                         
+    group root                                                                                                                                        
+    oneshot                                                                                                                                           
+

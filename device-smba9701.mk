@@ -42,7 +42,8 @@ PRODUCT_COPY_FILES += \
     device/malata/smba_common/prebuilt/bcm4329.hcd:system/etc/firmware/bcm4329.hcd
 
 PRODUCT_COPY_FILES += \
-    device/malata/smba9701/prebuilt/init.rc:root/init.rc
+    device/malata/smba9701/prebuilt/init.rc:root/init.rc \
+    device/malata/smba9701/prebuilt/init.local.rc:system/etc/init.local.rc
 
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.sf.lcd_density=160
@@ -74,12 +75,6 @@ ADDITIONAL_DEFAULT_PROPERTIES += \
 ADDITIONAL_BUILD_PROPERTIES += \
 	ro.additionalmounts=/storage/sdcard0 \
 	ro.vold.switchablepair=/storage/sdcard0,/storage/microsd
-
-# RIL
-ADDITIONAL_BUILD_PROPERTIES += \
-	rild.libpath=/system/lib/libmbm-ril.so \
-	rild.libargs="-d /dev/ttyACM0 -i wwan0" \
-	keyguard.no_require_sim=1
 
 # for bugmailer
 ifneq ($(TARGET_BUILD_VARIANT),user)
