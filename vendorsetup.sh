@@ -20,4 +20,5 @@
 # In particular, you can add lunch options with the add_lunch_combo
 # function: add_lunch_combo generic-eng
 export USE_CCACHE=1
-add_lunch_combo full_smba9701_3g-userdebug
+add_lunch_combo full_smba9701-userdebug
+add_lunch_combo mdl_smba9701-userdebug

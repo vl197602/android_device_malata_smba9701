@@ -68,7 +68,7 @@ ADDITIONAL_DEFAULT_PROPERTIES += \
 	persist.service.adb.enable=1
 
 ADDITIONAL_DEFAULT_PROPERTIES += \
-	persist.sys.usb.config=adb \
+	persist.sys.usb.config=adb,adb \
 	ro.phone_storage=1 \
 	service.adb.root=1
 
