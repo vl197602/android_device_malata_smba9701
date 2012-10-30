@@ -85,3 +85,4 @@ BOARD_VOLD_MAX_PARTITIONS := 16
 BOARD_SDCARD_INTERNAL_DEVICE := /dev/block/mmcblk0p7
 BOARD_PROVIDES_LIBRIL := false
 
+BOARD_CUSTOM_RECOVERY_KEYMAPPING := device/malata/smba9701/prebuilt/recovery_keys.c
