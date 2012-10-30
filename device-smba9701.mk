@@ -64,11 +64,7 @@ PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 	persist.service.adb.enable=1
 
 ADDITIONAL_DEFAULT_PROPERTIES += \
-	ro.secure=0 \
-	persist.service.adb.enable=1
-
-ADDITIONAL_DEFAULT_PROPERTIES += \
-	persist.sys.usb.config=adb,adb \
+	persist.sys.usb.config=adb \
 	ro.phone_storage=1 \
 	service.adb.root=1
 
