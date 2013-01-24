@@ -9,7 +9,6 @@ import java.net.URLConnection;
 import android.content.Context;
 import android.net.LocalSocket;
 import android.net.LocalSocketAddress;
-import android.util.Log;
 
 public class ServiceLoop extends Thread {
     private static final String TAG = "MBM_GPS_SERVICE";
@@ -27,9 +26,9 @@ public class ServiceLoop extends Thread {
     private Context context;
 
     public void run() {
-        Log.d(TAG, "Starting service loop");
+        MbmLog.v(TAG, "Starting service loop");
         if(!initDone) {
-            Log.d(TAG, "Error, init not done. Can't start loop.");
+            MbmLog.e(TAG, "Error, init not done. Can't start loop.");
             return;
         }
         try {
@@ -37,7 +36,7 @@ public class ServiceLoop extends Thread {
             while(!quit) {
                 try {
                     cmd = is.read();
-                    Log.d(TAG, "SERVICE LOOP READ: " + cmd);
+                    MbmLog.d(TAG, "SERVICE LOOP READ: " + cmd);
                     if(cmd == -1)
                         break;
                 } catch (Exception e) {
@@ -63,7 +62,7 @@ public class ServiceLoop extends Thread {
             initDone = false;
             is.close();
             localSocket.close();
-            Log.d(TAG, "Service loop exiting");
+            MbmLog.v(TAG, "Service loop exiting");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -88,7 +87,7 @@ public class ServiceLoop extends Thread {
         byte urlBytes[] = new byte[length];
         int read = is.read(urlBytes);
         if(read != length) {
-            Log.d(TAG, "readPgpsUrl read less than length.");
+            MbmLog.d(TAG, "readPgpsUrl read less than length.");
             return null;
         }
 
@@ -107,7 +106,7 @@ public class ServiceLoop extends Thread {
                 sendMessage(Status.MSG_PGPS_DATA + ":failed");
                 return;
             }
-            Log.d(TAG, "Got id: " + pgps_id + ", url: " + sUrl);
+            MbmLog.d(TAG, "Got id: " + pgps_id + ", url: " + sUrl);
 
             URL url = new URL(sUrl);
             URLConnection urlConn = url.openConnection();
@@ -123,7 +122,7 @@ public class ServiceLoop extends Thread {
                 count++;
             }
 
-            Log.d(TAG, "Wrote " + count + " bytes to " + context.getFileStreamPath("pgps.data").getAbsolutePath());
+            MbmLog.v(TAG, "Wrote " + count + " bytes to " + context.getFileStreamPath("pgps.data").getAbsolutePath());
 
             send(Status.MSG_PGPS_DATA + ":" +
                     Status.MSG_DELIMETER + "id=" + pgps_id +
@@ -151,18 +150,18 @@ public class ServiceLoop extends Thread {
     }
 
     private void send(String text) {
-        Log.v(TAG, text);
+        MbmLog.v(TAG, text);
         try {
             ServiceLoop.sendMessage(text);
         } catch (IOException e) {
-            Log.v(TAG,"Could not send to libmbm-gps socket");
+            MbmLog.e(TAG,"Could not send to libmbm-gps socket");
             e.printStackTrace();
-        }    
+        }
     }
 
     public static synchronized boolean sendMessage(String text) throws IOException {
         if(!initDone) {
-            Log.d(TAG, "not sending message, init not done");
+            MbmLog.d(TAG, "not sending message, init not done");
             return false;
         }
         /* send msb (of 16 bits) as one byte */

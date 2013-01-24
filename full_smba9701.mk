@@ -19,6 +19,10 @@ PRODUCT_PACKAGES += \
     Stk \
     Mms
 
+PRODUCT_PACKAGES += \
+    tinyplay \
+    tinycap \
+    tinymix \
 
 # Live Wallpapers
 PRODUCT_PACKAGES += \
@@ -31,6 +35,12 @@ PRODUCT_PACKAGES += \
     Camera
 
 PRODUCT_COPY_FILES := device/sample/etc/apns-full-conf.xml:system/etc/apns-conf.xml
+
+PRODUCT_COPY_FILES += \                                                                                                                                
+    device/malata/smba9701/prebuilt/init.rc:root/init.rc \                                                                                             
+    device/malata/smba9701/prebuilt/init.harmony.rc:root/init.harmony.rc \                                                                             
+    device/malata/smba9701/prebuilt/init.local.rc:system/etc/init.local.rc \                                                                           
+    device/malata/smba9701/prebuilt/vold.fstab:system/etc/vold.fstab                                                                                   
 
 # Inherit from those products. Most specific first.
 #$(call inherit-product, $(SRC_TARGET_DIR)/product/full_base.mk)
@@ -62,27 +72,3 @@ PRODUCT_MODEL := Malata SMBA9701
 PRODUCT_RESTRICT_VENDOR_FILES := false
 PRODUCT_MANUFACTURER:= Malata
 
-BOARD_MOBILEDATA_INTERFACE_NAME := "wwan0"
-
-TARGET_OTA_ASSERT_DEVICE := harmony,smba9701
-
-BOARD_USES_MBM_GPS := true
-
-#Built from source kernel
-TARGET_KERNEL_CONFIG        := tegra_smba9701_defconfig
-TARGET_KERNEL_SOURCE        := kernel/malata/smba9701
-
-TARGET_PROVIDES_INIT_RC := true
-
-BOARD_BOOTIMAGE_PARTITION_SIZE := 8388608
-BOARD_SYSTEMIMAGE_PARTITION_SIZE := 314572800
-BOARD_USERDATAIMAGE_PARTITION_SIZE := 2147483648
-
-TARGET_USERIMAGES_USE_EXT4 := true
-BOARD_UMS_LUNFILE := "/sys/devices/platform/fsl-tegra-udc/gadget/lun0/file"
-
-BOARD_VOLD_MAX_PARTITIONS := 16
-BOARD_SDCARD_INTERNAL_DEVICE := /dev/block/mmcblk0p7
-BOARD_PROVIDES_LIBRIL := false
-
-BOARD_CUSTOM_RECOVERY_KEYMAPPING := device/malata/smba9701/prebuilt/recovery_keys.c

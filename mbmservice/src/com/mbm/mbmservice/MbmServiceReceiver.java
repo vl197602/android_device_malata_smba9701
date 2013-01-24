@@ -11,12 +11,14 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
-import android.util.Log;
+import android.os.StrictMode;
 
 public class MbmServiceReceiver extends BroadcastReceiver {
     private static final String TAG = "MBM_GPS_SERVICE";
 
     private OperatorInfo currentOperator;
+
+    private static String oldApn = " ";
 
     public MbmServiceReceiver() {
         super();
@@ -28,7 +30,7 @@ public class MbmServiceReceiver extends BroadcastReceiver {
         String networkOperatorName = tm.getNetworkOperatorName();
         boolean roaming = tm.isNetworkRoaming();
         if (networkOperator != null && networkOperator.length() >= 5) {
-            Log.d(TAG, "NetworkOperator: " + networkOperator);
+            MbmLog.d(TAG, "NetworkOperator: " + networkOperator);
             String oMcc = networkOperator.substring(0, 3);
             String oMnc = networkOperator.substring(3);
             currentOperator.setName(networkOperatorName);
@@ -40,13 +42,13 @@ public class MbmServiceReceiver extends BroadcastReceiver {
     }
 
     public void onCellLocationChanged(TelephonyManager tm) {
-        Log.d(TAG, "onCellLocationChanged");
+        MbmLog.v(TAG, "onCellLocationChanged");
         updateOperatorInfo(tm);
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d(TAG, "MBM onReceive");
+        MbmLog.v(TAG, "MBM onReceive");
         String id = "";
         String apn = "";
         String password = "";
@@ -61,13 +63,13 @@ public class MbmServiceReceiver extends BroadcastReceiver {
         Status currentStatus = MbmService.getCurrentStatus();
 
         if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
-            Log.d(TAG, "BOOT COMPLETED");
+            MbmLog.v(TAG, "BOOT COMPLETED");
             Intent i = new Intent();
             i.setAction("com.mbm.mbmservice.MbmService");
             context.startService(i);
         } else if (intent.getAction().equals(
                 "android.location.PROVIDERS_CHANGED")) {
-            Log.d(TAG, "Location providers changed");
+            MbmLog.v(TAG, "Location providers changed");
             MbmService.onLocationProviderChanged();
         } else if (intent.getAction().equals(
                 Intent.ACTION_AIRPLANE_MODE_CHANGED)) {
@@ -117,11 +119,20 @@ public class MbmServiceReceiver extends BroadcastReceiver {
                 if (state.equals("CONNECTED") || state.equals("DISCONNECTED")) {
                     currentStatus.setDataState(state.toString().toLowerCase());
 
-                    ArrayList<ApnInfo> apns = new ArrayList<ApnInfo>(5);
+                    StrictMode.ThreadPolicy old = StrictMode.getThreadPolicy();
+                    StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy
+                        .Builder(old)
+                        .permitDiskReads()
+                        .permitDiskWrites()
+                        .build());
+
+                    ArrayList<ApnInfo> preferapns = new ArrayList<ApnInfo>(5);
                     Cursor mCursor = context.getContentResolver().query(
-                            Uri.parse("content://telephony/carriers"), null,
-                            null, null, null);
-                    if (mCursor != null) {
+                            Uri.parse("content://telephony/carriers/preferapn"),
+                            null, null, null, null);
+
+                    if (mCursor != null && (mCursor.getCount() > 0) ) {
+
                         while (mCursor != null && mCursor.moveToNext()) {
                             id = ""
                                     + mCursor.getString(mCursor
@@ -151,24 +162,79 @@ public class MbmServiceReceiver extends BroadcastReceiver {
                             type = ""
                                     + mCursor.getString(mCursor
                                             .getColumnIndex("type"));
-                            current = ""
+
+                            preferapns.add(new ApnInfo(name, apn, username, password, mcc,
+                                    mnc, type, authtype));
+                            }
+                            mCursor.close();
+                    } else {
+                            MbmLog.w(TAG,"preferapn database empty or missing");
+                            currentStatus.setApnInfo(null);
+                    }
+
+                    ArrayList<ApnInfo> apns = new ArrayList<ApnInfo>(5);
+                    mCursor = context.getContentResolver().query(
+                            Uri.parse("content://telephony/carriers"), null,
+                            "current=1", null, "name,type ASC");
+
+                    if (mCursor != null && (mCursor.getCount() > 0) && (preferapns.size() > 0) ) {
+
+                        while (mCursor != null && mCursor.moveToNext()) {
+                            id = ""
                                     + mCursor.getString(mCursor
-                                            .getColumnIndex("current"));
-                            apns.add(new ApnInfo(apn, username, password, mcc,
-                                    mnc, type, current, authtype));
+                                            .getColumnIndex("_id"));
+                            name = ""
+                                    + mCursor.getString(mCursor
+                                            .getColumnIndex("name"));
+                            apn = ""
+                                    + mCursor.getString(
+                                            mCursor.getColumnIndex("apn"))
+                                            .toLowerCase();
+                            username = ""
+                                    + mCursor.getString(mCursor
+                                            .getColumnIndex("user"));
+                            password = ""
+                                    + mCursor.getString(mCursor
+                                            .getColumnIndex("password"));
+                            mcc = ""
+                                    + mCursor.getString(mCursor
+                                            .getColumnIndex("mcc"));
+                            mnc = ""
+                                    + mCursor.getString(mCursor
+                                            .getColumnIndex("mnc"));
+                            authtype = ""
+                                    + mCursor.getString(mCursor
+                                            .getColumnIndex("authtype"));
+                            type = ""
+                                    + mCursor.getString(mCursor
+                                            .getColumnIndex("type"));
+
+                            apns.add(new ApnInfo(name, apn, username, password, mcc,
+                                    mnc, type, authtype));
                         }
                         mCursor.close();
-                        ApnInfo pApn = ApnInfo.getPreferredApn(apns,
+                        ApnInfo pApn = ApnInfo.getPreferredApn(preferapns, apns,
                                 currentOperator);
+                        if ((pApn != null) && !(oldApn.equals(pApn.getApn())) ) {
+                            oldApn = pApn.getApn();
+                            MbmLog.i(TAG,"SUPL Name[" + pApn.getName() +
+                                "]APN[" + pApn.getApn() +
+                                "]USER[" + pApn.getUsername() +
+                                "]PASS[Not Displayed" +
+                                "]AUTH[" + pApn.getAuthtype() +
+                                "]TYPE[" + pApn.getType() + "]");
+                        }
                         currentStatus.setApnInfo(pApn);
                     } else {
+                        MbmLog.w(TAG,"carrier database empty or missing");
                         currentStatus.setApnInfo(null);
                     }
+                    StrictMode.setThreadPolicy(old);
                 }
             }
         } else if (intent.getAction().equals(
                 TelephonyManager.ACTION_PHONE_STATE_CHANGED)) {
-            Log.d(TAG, "phone state changed");
+            MbmLog.v(TAG, "phone state changed");
 
             ConnectivityManager cm = (ConnectivityManager) context
                     .getSystemService(Context.CONNECTIVITY_SERVICE);

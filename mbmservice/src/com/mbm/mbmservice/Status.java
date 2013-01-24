@@ -9,7 +9,6 @@ import java.util.TimeZone;
 
 import android.net.NetworkInfo;
 import android.os.Handler;
-import android.util.Log;
 
 import com.android.internal.telephony.Phone;
 import com.android.internal.telephony.PhoneFactory;
@@ -47,6 +46,7 @@ public class Status {
         backgroundDataSetting = mobileDataAllowed = roamingAllowed = false;
         noConnectivity = true;
         apnInfo = null;
+        operatorInfo = null;
         networkInfo = extraNetworkInfo = null;
         airplaneMode = null;
         dataState = "";
@@ -54,11 +54,11 @@ public class Status {
     }
 
     private void send(String text) {
-        Log.v(TAG, text);
+        MbmLog.v(TAG, text);
         try {
             ServiceLoop.sendMessage(text);
         } catch (IOException e) {
-            Log.v(TAG, "Could not send to libmbm-gps socket");
+            MbmLog.e(TAG, "Could not send to libmbm-gps socket");
             e.printStackTrace();
         }
     }
@@ -87,7 +87,7 @@ public class Status {
 
     public void sendAllInfo() {
         if (apnInfo != null)
-            send(MSG_APN_INFO + ":" + "default=" + apnInfo.getsCurrent()
+            send(MSG_APN_INFO + ":" + "name=" + apnInfo.getName()
                     + MSG_DELIMETER + "apn=" + apnInfo.getApn() + MSG_DELIMETER
                     + "user=" + apnInfo.getUsername() + MSG_DELIMETER + "pass="
                     + apnInfo.getPassword() + MSG_DELIMETER + "mcc="
@@ -98,11 +98,19 @@ public class Status {
         else
             send(MSG_NO_APN_DEFINED);
 
-        send(MSG_OPERATOR_INFO + ":" + "name=" + operatorInfo.getName()
-                + MSG_DELIMETER + "mcc=" + operatorInfo.getMcc()
-                + MSG_DELIMETER + "mnc=" + operatorInfo.getMnc());
-        send(MSG_EXTRA_NETWORK_INFO + ":" + "type=" + networkInfo.getType()
-                + MSG_DELIMETER + "roaming=" + networkInfo.isRoaming());
+        if (operatorInfo != null)
+            send(MSG_OPERATOR_INFO + ":" + "name=" + operatorInfo.getName()
+                    + MSG_DELIMETER + "mcc=" + operatorInfo.getMcc()
+                    + MSG_DELIMETER + "mnc=" + operatorInfo.getMnc());
+        else
+            MbmLog.d(TAG, "operatorInfo not set before sendAllInfo");
+
+        if (networkInfo != null)
+            send(MSG_EXTRA_NETWORK_INFO + ":" + "type=" + networkInfo.getType()
+                    + MSG_DELIMETER + "roaming=" + networkInfo.isRoaming());
+        else
+            MbmLog.d(TAG, "networkInfo not set before sendAllInfo");
+
         send(MSG_EXTRA_OTHER_NETWORK_INFO + ":" + extraNetworkInfo);
         send(MSG_BACKGROUND_DATA_SETTING + ":" + backgroundDataSetting);
         send(MSG_MOBILE_DATA_ALLOWED + ":" + mobileDataAllowed);
@@ -120,7 +128,7 @@ public class Status {
         this.apnInfo = apnInfo;
 
         if (apnInfo != null)
-            send(MSG_APN_INFO + ":" + "default=" + apnInfo.getsCurrent()
+            send(MSG_APN_INFO + ":" + "name=" + apnInfo.getName()
                     + MSG_DELIMETER + "apn=" + apnInfo.getApn() + MSG_DELIMETER
                     + "user=" + apnInfo.getUsername() + MSG_DELIMETER + "pass="
                     + apnInfo.getPassword() + MSG_DELIMETER + "mcc="
@@ -139,9 +147,10 @@ public class Status {
     public void setOperatorInfo(OperatorInfo operatorInfo) {
         this.operatorInfo = operatorInfo;
 
-        send(MSG_OPERATOR_INFO + ":" + "name=" + operatorInfo.getName()
-                + MSG_DELIMETER + "mcc=" + operatorInfo.getMcc()
-                + MSG_DELIMETER + "mnc=" + operatorInfo.getMnc());
+        if (operatorInfo != null)
+            send(MSG_OPERATOR_INFO + ":" + "name=" + operatorInfo.getName()
+                    + MSG_DELIMETER + "mcc=" + operatorInfo.getMcc()
+                    + MSG_DELIMETER + "mnc=" + operatorInfo.getMnc());
     }
 
     public NetworkInfo getNetworkInfo() {
@@ -151,8 +160,9 @@ public class Status {
     public void setNetworkInfo(NetworkInfo networkInfo) {
         this.networkInfo = networkInfo;
 
-        send(MSG_EXTRA_NETWORK_INFO + ":" + "type=" + networkInfo.getType()
-                + MSG_DELIMETER + "roaming=" + networkInfo.isRoaming());
+        if (networkInfo != null)
+            send(MSG_EXTRA_NETWORK_INFO + ":" + "type=" + networkInfo.getType()
+                    + MSG_DELIMETER + "roaming=" + networkInfo.isRoaming());
     }
 
     public NetworkInfo getExtraNetworkInfo() {

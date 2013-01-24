@@ -14,24 +14,12 @@
 # limitations under the License.
 #
 
-#ifeq ($(TARGET_PREBUILT_KERNEL),)
-#LOCAL_KERNEL := device/malata/smba9701/prebuilt/kernel
-#else
-#LOCAL_KERNEL := $(TARGET_PREBUILT_KERNEL)
-#endif
-
-#PRODUCT_COPY_FILES += \
-#    $(LOCAL_KERNEL):kernel
-
-# Install smba9701 kernel modules from prebuilt
-#$(call inherit-product, device/malata/smba9701/smba9701-modules.mk)
-
 DEVICE_PACKAGE_OVERLAYS += device/malata/smba9701/overlay
 
 PRODUCT_LOCALES := en_US
 
 PRODUCT_PROPERTY_OVERRIDES += \
-    ro.sf.lcd_density=120
+    ro.sf.lcd_density=160
 
 # Set default USB interface
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
@@ -41,14 +29,7 @@ PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 PRODUCT_COPY_FILES += \
     device/malata/smba_common/prebuilt/bcm4329.hcd:system/etc/firmware/bcm4329.hcd
 
-PRODUCT_COPY_FILES += \
-    device/malata/smba9701/prebuilt/init.rc:root/init.rc \
-    device/malata/smba9701/prebuilt/init.local.rc:system/etc/init.local.rc
-
-PRODUCT_PROPERTY_OVERRIDES += \
-    ro.sf.lcd_density=160
-
-# Harmony Hardware
+# 3G Hardware
 PRODUCT_PACKAGES += \
 	libmbm-ril \
 	libmbm-gps \
@@ -64,9 +45,7 @@ PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 	persist.service.adb.enable=1
 
 ADDITIONAL_DEFAULT_PROPERTIES += \
-	persist.sys.usb.config=adb \
-	ro.phone_storage=1 \
-	service.adb.root=1
+	ro.phone_storage=1
 
 ADDITIONAL_BUILD_PROPERTIES += \
 	ro.additionalmounts=/storage/sdcard0 \

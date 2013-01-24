@@ -9,7 +9,6 @@ import android.os.IBinder;
 import android.telephony.CellLocation;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 
 public class MbmService extends Service
 {
@@ -25,9 +24,9 @@ public class MbmService extends Service
     }
 
     @Override
-    public void onCreate() 
+    public void onCreate()
     {
-        Log.v(TAG, "MbmGpsService Created");
+        MbmLog.v(TAG, "MbmGpsService Created");
         final MbmServiceReceiver msr = new MbmServiceReceiver();
         final TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -62,12 +61,12 @@ public class MbmService extends Service
                     int retries = 0;
 
                     while(!serviceLoop.init(context)) {
-                        Log.d(TAG, "Error initing service loop");
+                        MbmLog.e(TAG, "Error initing service loop");
                         if(retries++ > 15) {
-                            Log.d(TAG, "15 attempts exhausted. Giving up.");
+                            MbmLog.e(TAG, "15 attempts exhausted. Giving up.");
                             return;
                         }
-                        Log.d(TAG, "Retrying in 5 seconds");
+                        MbmLog.e(TAG, "Retrying in 5 seconds");
                         try {
                             Thread.sleep(5000);
                         } catch (InterruptedException e) {
@@ -75,12 +74,12 @@ public class MbmService extends Service
                         }
                     }
 
-                    Log.d(TAG, "MBM Service initiated");
+                    MbmLog.d(TAG, "MBM Service initiated");
                     try {
                         serviceLoop.start();
                     } catch(IllegalThreadStateException ie) {
                         ie.printStackTrace();
-                        Log.d(TAG, "Service loop already running");
+                        MbmLog.e(TAG, "Service loop already running");
                     }
                 }
             };
@@ -88,7 +87,7 @@ public class MbmService extends Service
             Thread t = new Thread(serviceMonitor);
             t.start();
         } else {
-            Log.d(TAG, "Gps is not enabled. Not starting service loop");
+            MbmLog.d(TAG, "Gps is not enabled. Not starting service loop");
         }
     }
 
@@ -97,14 +96,14 @@ public class MbmService extends Service
             gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
             startServiceLoop();
         } else {
-            Log.d(TAG, "Not starting service loop since service not started yet");
+            MbmLog.d(TAG, "Not starting service loop since service not started yet");
         }
 
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.v(TAG, "MbmGpsService -- onStartCommand()");
+        MbmLog.v(TAG, "MbmGpsService -- onStartCommand()");
 
         // We want this service to continue running until it is explicitly
         // stopped, so return sticky.
@@ -115,7 +114,7 @@ public class MbmService extends Service
     @Override
     public void onDestroy()
     {
-        Log.v(TAG, "MbmGpsService Destroyed");
+        MbmLog.v(TAG, "MbmGpsService Destroyed");
     }
 
     public static Status getCurrentStatus() {
