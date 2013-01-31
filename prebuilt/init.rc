@@ -126,7 +126,7 @@ loglevel 3
 
 on fs
 # mount mtd partitions
-    # Mount /system rw first to give the filesystem a chance to save a checkpoint
+#    # Mount /system rw first to give the filesystem a chance to save a checkpoint
     mount ext4 /dev/block/mmcblk0p3 /system
     mount ext4 /dev/block/mmcblk0p3 /system ro remount
     mount ext4 /dev/block/mmcblk0p6 /data rw wait noatime nodirtime nosuid nodev

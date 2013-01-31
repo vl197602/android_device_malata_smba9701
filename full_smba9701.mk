@@ -15,14 +15,12 @@
 # Additional Product Packages for TeamDRH Build
 PRODUCT_PACKAGES += \
     SpareParts \
-    Development \
-    Stk \
-    Mms
+    Development
 
 PRODUCT_PACKAGES += \
     tinyplay \
     tinycap \
-    tinymix \
+    tinymix
 
 # Live Wallpapers
 PRODUCT_PACKAGES += \
@@ -34,16 +32,18 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     Camera
 
-PRODUCT_COPY_FILES := device/sample/etc/apns-full-conf.xml:system/etc/apns-conf.xml
+PRODUCT_COPY_FILES += device/sample/etc/apns-full-conf.xml:system/etc/apns-conf.xml
 
-PRODUCT_COPY_FILES += \                                                                                                                                
-    device/malata/smba9701/prebuilt/init.rc:root/init.rc \                                                                                             
-    device/malata/smba9701/prebuilt/init.harmony.rc:root/init.harmony.rc \                                                                             
-    device/malata/smba9701/prebuilt/init.local.rc:system/etc/init.local.rc \                                                                           
-    device/malata/smba9701/prebuilt/vold.fstab:system/etc/vold.fstab                                                                                   
+PRODUCT_COPY_FILES += \
+    device/malata/smba9701/prebuilt/init.rc:root/init.rc \
+    device/malata/smba9701/prebuilt/init.harmony.rc:root/init.harmony.rc \
+    device/malata/smba9701/prebuilt/init.local.rc:system/etc/init.local.rc \
+    device/malata/smba9701/prebuilt/vold.fstab:system/etc/vold.fstab
+
+# Inherit from device specific if exists
+$(call inherit-product-if-exists, device/malata/smba9701/device-smba9701.mk)
 
 # Inherit from those products. Most specific first.
-#$(call inherit-product, $(SRC_TARGET_DIR)/product/full_base.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 
 # The gps config appropriate for this device
@@ -52,12 +52,6 @@ $(call inherit-product, device/common/gps/gps_us_supl.mk)
 # This is where we'd set a backup provider if we had one
 #$(call inherit-product, device/sample/products/backup_overlay.mk)
 $(call inherit-product, device/malata/smba_common/device-common.mk)
-
-# Inherit from device specific if exists
-$(call inherit-product-if-exists, vendor/malata/smba9701/smba9701-vendor.mk)
-
-# Inherit from device specific if exists
-$(call inherit-product-if-exists, device/malata/smba9701/device-smba9701.mk)
 
 # These is the hardware-specific overlay, which points to the location
 # of hardware-specific resource overrides, typically the frameworks and
@@ -71,4 +65,3 @@ PRODUCT_BRAND := Malata
 PRODUCT_MODEL := Malata SMBA9701
 PRODUCT_RESTRICT_VENDOR_FILES := false
 PRODUCT_MANUFACTURER:= Malata
-

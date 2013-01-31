@@ -19,32 +19,30 @@ DEVICE_PACKAGE_OVERLAYS += device/malata/smba9701/overlay
 PRODUCT_LOCALES := en_US
 
 PRODUCT_PROPERTY_OVERRIDES += \
-    ro.sf.lcd_density=160
+	ro.sf.lcd_density=160
 
 # Set default USB interface
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
-    persist.sys.usb.config=mtp
+	persist.sys.usb.config=mtp
 
 # Bluetooth
 PRODUCT_COPY_FILES += \
-    device/malata/smba_common/prebuilt/bcm4329.hcd:system/etc/firmware/bcm4329.hcd
+	device/malata/smba_common/prebuilt/bcm4329.hcd:system/etc/firmware/bcm4329.hcd
 
 # 3G Hardware
 PRODUCT_PACKAGES += \
 	libmbm-ril \
 	libmbm-gps \
-	MbmService
+#	MbmService
         
 PRODUCT_PROPERTY_OVERRIDES += \
 	ro.opengles.version=131072
 
 #Set default.prop properties for root + adb
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
+ADDITIONAL_DEFAULT_PROPERTIES += \
 	ro.secure=0 \
     	ro.allow.mock.location=1 \
-	persist.service.adb.enable=1
-
-ADDITIONAL_DEFAULT_PROPERTIES += \
+	persist.service.adb.enable=1 \
 	ro.phone_storage=1
 
 ADDITIONAL_BUILD_PROPERTIES += \

@@ -4,7 +4,7 @@ $(call inherit-product, vendor/cm/config/gsm.mk)
 TARGET_BOOTANIMATION_NAME := horizontal-1024x768
 
 # Inherit some common cyanogenmod stuff.
-$(call inherit-product, vendor/cm/config/common_full_tablet_wifionly.mk)
+$(call inherit-product, vendor/cm/config/common_full_phone.mk)
 
 # Inherit device configuration for smb_b9701.
 $(call inherit-product, device/malata/smba9701/full_smba9701.mk)
