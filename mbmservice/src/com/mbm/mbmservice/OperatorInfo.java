@@ -34,8 +34,8 @@ public class OperatorInfo {
     public void setMnc(String mnc) {
         this.mnc = mnc;
     }
-    
+
     public String toString() {
-        return "Name: " + name + "\nMCC/MNC: " + mcc + "/" + mnc;
+        return "Name[" + name + "]MCC/MNC[" + mcc + "/" + mnc + "]";
     }
 }

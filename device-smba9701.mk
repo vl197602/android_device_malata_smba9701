@@ -14,73 +14,56 @@
 # limitations under the License.
 #
 
-#ifeq ($(TARGET_PREBUILT_KERNEL),)
-#LOCAL_KERNEL := device/malata/smba9701/prebuilt/kernel
-#else
-#LOCAL_KERNEL := $(TARGET_PREBUILT_KERNEL)
-#endif
 
-#PRODUCT_COPY_FILES += \
-#    $(LOCAL_KERNEL):kernel
+#Built from source kernel
+TARGET_KERNEL_CONFIG	:= tegra_smba9701_defconfig
+TARGET_KERNEL_SOURCE	:= kernel/malata/smba9701
+TARGET_ARH		:= arm
 
-# Install smba9701 kernel modules from prebuilt
-#$(call inherit-product, device/malata/smba9701/smba9701-modules.mk)
+$(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 
-DEVICE_PACKAGE_OVERLAYS += device/malata/smba9701/overlay
+# The gps config appropriate for this device
+$(call inherit-product, device/common/gps/gps_us_supl.mk)
 
-PRODUCT_LOCALES := en_US
+# Inherit from smba_common
+$(call inherit-product, device/malata/smba_common/device-common.mk)
 
-PRODUCT_PROPERTY_OVERRIDES += \
-    ro.sf.lcd_density=120
+# Install Apps
+$(call inherit-product, device/malata/smba9701/app/drh_apps.mk)
 
-# Set default USB interface
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
-    persist.sys.usb.config=mtp
+# Inherit from vendor specific if exists
+$(call inherit-product-if-exists, vendor/malata/smba9701/smba9701-vendor.mk)
 
-# Bluetooth
-PRODUCT_COPY_FILES += \
-    device/malata/smba_common/prebuilt/bcm4329.hcd:system/etc/firmware/bcm4329.hcd
+#Camera
+PRODUCT_PACKAGES += \
+	Camera
 
-PRODUCT_COPY_FILES += \
-    device/malata/smba9701/prebuilt/init.rc:root/init.rc \
-    device/malata/smba9701/prebuilt/init.local.rc:system/etc/init.local.rc
+DEVICE_PACKAGE_OVERLAYS += \
+	device/malata/smba9701/overlay
 
 PRODUCT_PROPERTY_OVERRIDES += \
-    ro.sf.lcd_density=160
+	ro.sf.lcd_density=120 \
+	ro.opengles.version=131072
 
-# Harmony Hardware
+#Key layout
+PRODUCT_COPY_FILES += \
+	device/malata/smba9701/prebuilt/gpio-keys.kl:system/usr/keylayout/gpio-keys.kl \
+	device/malata/smba9701/prebuilt/ramdisk/init.harmony.rc:root/init.harmony.rc \
+	device/malata/smba9701/prebuilt/vold.fstab:system/etc/vold.fstab \
+	device/malata/smba9701/prebuilt/ramdisk/fstab.harmony:root/fstab.harmony \
+	device/malata/smba9701/prebuilt/03sysctl:system/etc/init.d/03sysctl \
+	device/malata/smba9701/prebuilt/ntfs-3g:system/xbin/ntfs-3g
+
+# 3G Hardware
 PRODUCT_PACKAGES += \
 	libmbm-ril \
 	libmbm-gps \
-	MbmService
+#	MbmService
         
-PRODUCT_PROPERTY_OVERRIDES += \
-	ro.opengles.version=131072
-
 #Set default.prop properties for root + adb
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
-	ro.secure=0 \
-    	ro.allow.mock.location=1 \
-	persist.service.adb.enable=1
-
 ADDITIONAL_DEFAULT_PROPERTIES += \
-	persist.sys.usb.config=adb \
+    	ro.allow.mock.location=1 \
+	ro.secure=0 \
+	persist.service.adb.enable=1 \
 	ro.phone_storage=1 \
 	service.adb.root=1
-
-ADDITIONAL_BUILD_PROPERTIES += \
-	ro.additionalmounts=/storage/sdcard0 \
-	ro.vold.switchablepair=/storage/sdcard0,/storage/microsd
-
-# for bugmailer
-ifneq ($(TARGET_BUILD_VARIANT),user)
-	PRODUCT_PACKAGES += send_bug
-	PRODUCT_COPY_FILES += \
-		system/extras/bugmailer/bugmailer.sh:system/bin/bugmailer.sh \
-		system/extras/bugmailer/send_bug:system/bin/send_bug
-endif
-
-# Make it optional to include vendor stuff..Just to be nice ;)
-ifneq ($(TARGET_IGNORE_VENDOR),yes)
-$(call inherit-product, vendor/malata/smba9701/smba9701-vendor.mk)
-endif
