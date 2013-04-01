@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+  <project name="redeyedjedi/android_device_smba_common" path="device/malata/smba_common" remote="github" revision="CM-10.1" />
+  <project name="whyberg/android_device_malata_smba9701" path="device/malata/smba9701" remote="github" revision="JB4.2" />
+  <project name="TeamDRH/vendor_malata" path="vendor/malata" remote="github" revision="jellybean" />
+  <project name="fosser2/android-tegra-nv-3.1.10-rel-15r7" path="kernel/malata/smba9701" remote="github" revision="experimental" />
+</manifest>
