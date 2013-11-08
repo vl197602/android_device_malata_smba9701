@@ -1,5 +1,5 @@
 # Inherit device configuration.
-$(call inherit-product, device/malata/smba9701/device-smba9701.mk)
+$(call inherit-product, device/malata/smba9701/full_smba9701.mk)
 
 # Inherit some common cyanogenmod stuff.
 $(call inherit-product, vendor/cm/config/common_full_phone.mk)
